@@ -1,0 +1,21 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: "api-gateway"
+  cloud:
+    gateway:
+      routes:
+        - id: "auth-services"
+          uri: "http://localhost:8080"
+          predicates:
+            - Path=/auth/**
+          filters:
+            - RewritePath=/auth/(?<segment>.*), /api/v1/auth/${segment}
+        - id: "profile-services"
+          uri: "http://localhost:8000"
+          predicates:
+            - Path=/profiles/**
+          filters:
+            - RewritePath=/profiles/(?<segment>.*), /api/v1/profiles/${segment}
+debug: true
