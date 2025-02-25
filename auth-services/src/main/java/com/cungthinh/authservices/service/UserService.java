@@ -4,16 +4,15 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import com.cungthinh.authservices.dto.request.ProfileCreationRequest;
-import com.cungthinh.authservices.mapper.ProfileMapper;
-import com.cungthinh.authservices.repository.feign.ProfileClient;
 import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.cungthinh.authservices.dto.request.ProfileCreationRequest;
 import com.cungthinh.authservices.dto.request.UserCreationRequest;
 import com.cungthinh.authservices.dto.request.UserUpdateRequest;
 import com.cungthinh.authservices.dto.response.ApiResponse;
@@ -23,9 +22,11 @@ import com.cungthinh.authservices.entity.Role;
 import com.cungthinh.authservices.entity.UserEntity;
 import com.cungthinh.authservices.exception.CustomException;
 import com.cungthinh.authservices.exception.ErrorCode;
+import com.cungthinh.authservices.mapper.ProfileMapper;
 import com.cungthinh.authservices.mapper.UserMapper;
 import com.cungthinh.authservices.repository.RoleRepository;
 import com.cungthinh.authservices.repository.UserResipotory;
+import com.cungthinh.authservices.repository.feign.ProfileClient;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +48,7 @@ public class UserService {
 
     @Autowired
     private ProfileMapper profileMapper;
+
     @Autowired
     private ProfileClient profileClient;
 

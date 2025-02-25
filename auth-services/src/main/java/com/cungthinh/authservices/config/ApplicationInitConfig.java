@@ -1,7 +1,7 @@
 package com.cungthinh.authservices.config;
 
-import com.cungthinh.authservices.entity.Role;
-import jakarta.transaction.Transactional;
+import java.util.HashSet;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.cungthinh.authservices.entity.Role;
 import com.cungthinh.authservices.entity.UserEntity;
 import com.cungthinh.authservices.repository.RoleRepository;
 import com.cungthinh.authservices.repository.UserResipotory;
@@ -17,8 +18,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.HashSet;
 
 @Configuration
 @RequiredArgsConstructor
@@ -42,7 +41,8 @@ public class ApplicationInitConfig {
         return args -> {
             if (userResipotory.findByEmail("admin@gmail.com").isEmpty()) {
                 HashSet<Role> roles = new HashSet<>();
-                Role adminRole = roleRepository.findById("ADMIN")
+                Role adminRole = roleRepository
+                        .findById("ADMIN")
                         .orElseThrow(() -> new RuntimeException("ADMIN role not found"));
                 roles.add(adminRole);
                 UserEntity user = UserEntity.builder()

@@ -1,6 +1,5 @@
 package com.cungthinh.authservices.entity;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 import jakarta.persistence.*;

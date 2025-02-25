@@ -14,6 +14,9 @@ class ProfileAlreadyExists(MyCustomException):
 class ProfileNotFound(MyCustomException):
     pass
 
+class InSufficientPermission(MyCustomException):
+    pass
+
 def create_exception_handler(
         status_code: int, initial_detail: Any
 ) -> Callable[[Request, Exception], JSONResponse]:
@@ -42,6 +45,17 @@ def register_all_errors(app: FastAPI):
             initial_detail= {
                 "message": "Profile không tồn tại",
                 "error_code": "profile_not_found"
+            }
+        )
+    )
+
+    app.add_exception_handler(
+        InSufficientPermission,
+        create_exception_handler(
+            status_code=status.HTTP_403_FORBIDDEN,
+            initial_detail= {
+                "message": "Bạn không đủ quyền truy cập vào tài nguyên này",
+                "error_code": "insufficient_permission"
             }
         )
     )

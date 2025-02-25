@@ -29,4 +29,4 @@ class Profile(Base):
     phone = Column(String(15), nullable=False)
     address_id = Column(UUID(as_uuid=True), ForeignKey("addresses.id"), nullable=False)
 
-    address = relationship("Address", back_populates="profile")
+    address = relationship("Address", back_populates="profile", lazy="selectin")

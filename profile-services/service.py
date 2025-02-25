@@ -33,3 +33,6 @@ class ProfileService:
 
     async def get_profile_by_user_id(self, user_id: UUID) -> Profile:
         return await self.profile_repo.find_by_user_id(user_id)
+
+    async def get_all_profiles(self):
+        return await self.profile_repo.get_all()

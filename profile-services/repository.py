@@ -2,6 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from uuid import UUID
 
+from sqlalchemy.orm import selectinload
+
 from models import Profile, Address
 
 
@@ -26,6 +28,12 @@ class ProfileRepository:
             select(Profile).filter_by(user_id=user_id)
         )
         return result.scalars().first()
+
+    async def get_all(self):
+        result = await self.session.execute(
+            select(Profile)
+        )
+        return result.scalars().all()
 
 class AddressRepository:
     def __init__(self, session: AsyncSession):

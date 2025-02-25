@@ -14,7 +14,8 @@ public enum ErrorCode {
     PERMISSION_NOT_FOUND(1006, "Permission không tồn tại", HttpStatus.NOT_FOUND),
     ROLE_NOT_FOUND(1007, "Role không tồn tại", HttpStatus.NOT_FOUND),
     INVALID_TOKEN(1008, "Token không hợp lệ", HttpStatus.UNAUTHORIZED),
-    PROFILE_CREATION_FAILED(1009, "Lỗi khởi tạo profile, vui lòng kiểm tra lại dữ liệu", HttpStatus.INTERNAL_SERVER_ERROR),
+    PROFILE_CREATION_FAILED(
+            1009, "Lỗi khởi tạo profile, vui lòng kiểm tra lại dữ liệu", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
 
     ErrorCode(int code, String message, HttpStatus httpStatus) {

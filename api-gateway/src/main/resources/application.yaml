@@ -15,7 +15,7 @@ spring:
         - id: "profile-services"
           uri: "http://localhost:8000"
           predicates:
-            - Path=/profiles/**
+            - Path=/profiles, /profiles/**
           filters:
-            - RewritePath=/profiles/(?<segment>.*), /api/v1/profiles/${segment}
+            - RewritePath=/profiles(?<segment>/.*)?, /api/v1/profiles${segment}
 debug: true

@@ -13,12 +13,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cungthinh.authservices.dto.request.IntrospectTokenRequest;
 import com.cungthinh.authservices.dto.request.LoginRequest;
 import com.cungthinh.authservices.dto.request.LogoutRequest;
 import com.cungthinh.authservices.dto.request.RefreshTokenRequest;
 import com.cungthinh.authservices.dto.response.ApiResponse;
 import com.cungthinh.authservices.dto.response.LoginResponse;
+import com.cungthinh.authservices.exception.CustomException;
 import com.cungthinh.authservices.service.AuthenticationService;
+import com.nimbusds.jose.JOSEException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,6 +57,20 @@ public class AuthController {
         LoginResponse result = authService.refresh(refreshTokenRequest.getToken());
         ApiResponse<Object> response = ApiResponse.success(result, "Refresh token thành công");
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/introspect")
+    public ResponseEntity<?> introspect(@RequestBody IntrospectTokenRequest request)
+            throws ParseException, JOSEException {
+        try {
+            authService.verifyToken(request.getToken(), false);
+            ApiResponse<Object> response = ApiResponse.success(null, "Token hợp lệ");
+            return ResponseEntity.ok(response);
+        } catch (CustomException e) {
+            ApiResponse<Object> response =
+                    ApiResponse.error(e.getMessage(), e.getErrorCode().getCode());
+            return ResponseEntity.ok(response);
+        }
     }
 
     // @GetMapping("/logout")

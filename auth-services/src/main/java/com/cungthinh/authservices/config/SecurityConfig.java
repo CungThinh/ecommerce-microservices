@@ -23,7 +23,11 @@ public class SecurityConfig {
     private CustomJWTDecoder customJWTDecoder;
 
     private final String[] PUBLIC_ENDPOINTS = {
-        "/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/logout", "api/v1/users/add",
+        "/api/v1/auth/login",
+        "/api/v1/auth/refresh",
+        "/api/v1/auth/logout",
+        "api/v1/users/add",
+        "api/v1/auth/introspect"
     };
 
     @Bean

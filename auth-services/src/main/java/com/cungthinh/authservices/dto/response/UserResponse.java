@@ -1,6 +1,5 @@
 package com.cungthinh.authservices.dto.response;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonInclude;

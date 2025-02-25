@@ -171,7 +171,7 @@ public class AuthenticationService {
         }
 
         if (jwtBlackListService.isTokenBlacklisted(token)) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHENTICATED);
         }
 
         return signedJWT;
