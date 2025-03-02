@@ -5,24 +5,22 @@ from jose import JWTError, jwt
 from starlette import status
 from exceptions import InSufficientPermission
 
-SECRET_KEY = "63iPoQhsvC+H6+Oz9WSDp0ePZZllx+7Y/e3Dnz1MEKsvCD43CByhuCg/zQ7sbz9b"
-ALGORITHM = "HS512"
-
 security = HTTPBearer()
 
-def verify_token(credentials: HTTPAuthorizationCredentials = Security(security)) -> dict:
+def extract_token(credentials: HTTPAuthorizationCredentials = Security(security)) -> dict:
     """Extracts and validates the JWT token from the request."""
     token = credentials.credentials
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload  # Return full payload (including roles, user ID, etc.)
+        # No need for secretKey
+        payload = jwt.decode(token,"", options={"verify_signature":False})
+        return payload
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing token"
         )
 
-def get_user_scope(payload: dict = Depends(verify_token)) -> List[str]:
+def get_user_scope(payload: dict = Depends(extract_token)) -> List[str]:
     """Extracts the user's roles (scope) from the JWT payload."""
     scope = payload.get("scope", "")
     return scope.split(" ") if scope else []

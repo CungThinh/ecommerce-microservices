@@ -166,7 +166,6 @@ public class AuthenticationService {
         }
 
         if (expirationTime.before(new Date())) {
-            //            log.info("Token hết hạn");
             throw new CustomException(ErrorCode.UNAUTHENTICATED);
         }
 
