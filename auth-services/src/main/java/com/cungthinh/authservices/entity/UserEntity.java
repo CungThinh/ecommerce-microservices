@@ -31,18 +31,8 @@ public class UserEntity {
     @Column(columnDefinition = "varchar(255)", nullable = false)
     String password;
 
-    // @Column(columnDefinition = "varchar(255)")
-    // String firstName;
-    //
-    //    @Column(columnDefinition = "varchar(255)")
-    //    String lastName;
-    //
-    //    @Column(columnDefinition = "varchar(255)")
-    //    boolean enabled;
-    //
-    //    Date lastPasswordResetDate;
-    //
-    //    boolean isOtpRequired;
+    @Column(columnDefinition = "varchar(255)")
+    Boolean enabled;
 
     @ManyToMany
     Set<Role> roles;

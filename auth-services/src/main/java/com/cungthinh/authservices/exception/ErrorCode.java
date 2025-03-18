@@ -16,6 +16,8 @@ public enum ErrorCode {
     INVALID_TOKEN(1008, "Token không hợp lệ", HttpStatus.UNAUTHORIZED),
     PROFILE_CREATION_FAILED(
             1009, "Lỗi khởi tạo profile, vui lòng kiểm tra lại dữ liệu", HttpStatus.INTERNAL_SERVER_ERROR),
+    OTP_EXPIRED(1010, "OTP đã hết hạn", HttpStatus.BAD_REQUEST),
+    OTP_INVALID(1011, "OTP không hợp lệ", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatus httpStatus) {

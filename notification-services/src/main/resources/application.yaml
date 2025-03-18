@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: notification-services
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      enable-auto-commit: false
+      properties:
+        spring.json.trusted.packages: "*"
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: macthinh22@gmail.com
+  password: zjma izzr cabu witx
+  debug: true
+server:
+  port: 8086

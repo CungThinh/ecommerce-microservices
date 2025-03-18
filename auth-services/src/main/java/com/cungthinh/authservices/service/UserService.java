@@ -4,9 +4,11 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import com.cungthinh.event.dto.AccountVerificationEvent;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,6 +54,12 @@ public class UserService {
     @Autowired
     private ProfileClient profileClient;
 
+    @Autowired
+    private OtpService otpService;
+
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
     @Transactional(rollbackOn = Exception.class)
     public UserResponse addUser(UserCreationRequest request) {
         Optional<UserEntity> existUser = userResipotory.findByEmail(request.getEmail());
@@ -67,6 +75,12 @@ public class UserService {
             ProfileCreationRequest profileCreationRequest = profileMapper.toProfileCreationRequest(request);
             profileCreationRequest.setUserId(newUser.getId());
             profileClient.createProfile(profileCreationRequest);
+
+            String otp = otpService.generateOtp(newUser.getEmail());
+            AccountVerificationEvent event = AccountVerificationEvent.builder()
+                    .otp(otp)
+                    .email(newUser.getEmail()).build();
+            kafkaTemplate.send("new-user-created", event);
 
             return userMapper.toUserResponse(newUser);
         } else {

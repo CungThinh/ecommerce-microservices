@@ -1,9 +1,9 @@
-from typing import Callable, Any
-
-from fastapi import FastAPI
-from fastapi.requests import Request
+from typing import Callable
+from fastapi import FastAPI, Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from fastapi import status
+from datetime import datetime
+from global_schemas import ApiResponse  # Assuming your ApiResponse is in this module
 
 class MyCustomException(Exception):
     pass
@@ -17,13 +17,22 @@ class InSufficientPermission(MyCustomException):
 class UserUnauthorized(MyCustomException):
     pass
 
+class OrderNotFound(MyCustomException):
+    pass
+
 def create_exception_handler(
-        status_code: int, initial_detail: Any
+        status_code: int,
+        error_code: int,
+        message: str
 ) -> Callable[[Request, Exception], JSONResponse]:
 
     async def exception_handler(request: Request, exc: MyCustomException):
+        error_response = ApiResponse.error_response(
+            code=error_code,
+            message=message
+        )
+        return JSONResponse(content=jsonable_encoder(error_response), status_code=status_code)
 
-        return JSONResponse(content=initial_detail, status_code=status_code)
     return exception_handler
 
 def register_all_errors(app: FastAPI):
@@ -31,10 +40,8 @@ def register_all_errors(app: FastAPI):
         ProductOutOfStock,
         create_exception_handler(
             status_code=status.HTTP_400_BAD_REQUEST,
-            initial_detail= {
-                "message": "Một số sản phẩm đã được cập nhật, vui lòng quay lại giỏ hàng",
-                "error_code": "product_out_of_stock"
-            }
+            error_code=7001,
+            message="Một số sản phẩm đã được cập nhật, vui lòng quay lại giỏ hàng"
         )
     )
 
@@ -42,10 +49,8 @@ def register_all_errors(app: FastAPI):
         InSufficientPermission,
         create_exception_handler(
             status_code=status.HTTP_403_FORBIDDEN,
-            initial_detail= {
-                "message": "Không đủ quyền truy cập",
-                "error_code": "insufficient_permission"
-            }
+            error_code=7002,
+            message="Không đủ quyền truy cập"
         )
     )
 
@@ -53,9 +58,16 @@ def register_all_errors(app: FastAPI):
         UserUnauthorized,
         create_exception_handler(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            initial_detail= {
-                "message": "User chưa được xác thực",
-                "error_code": "user_unauthorized"
-            }
+            error_code=7003,
+            message="User chưa được xác thực"
+        )
+    )
+
+    app.add_exception_handler(
+        OrderNotFound,
+        create_exception_handler(
+            status_code=status.HTTP_404_NOT_FOUND,
+            error_code=7004,
+            message="Không tìm thấy order"
         )
     )

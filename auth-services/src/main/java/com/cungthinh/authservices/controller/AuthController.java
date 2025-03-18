@@ -2,6 +2,8 @@ package com.cungthinh.authservices.controller;
 
 import java.text.ParseException;
 
+import com.cungthinh.authservices.dto.request.*;
+import com.cungthinh.authservices.service.OtpService;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cungthinh.authservices.dto.request.IntrospectTokenRequest;
-import com.cungthinh.authservices.dto.request.LoginRequest;
-import com.cungthinh.authservices.dto.request.LogoutRequest;
-import com.cungthinh.authservices.dto.request.RefreshTokenRequest;
 import com.cungthinh.authservices.dto.response.ApiResponse;
 import com.cungthinh.authservices.dto.response.LoginResponse;
 import com.cungthinh.authservices.exception.CustomException;
@@ -33,6 +31,9 @@ public class AuthController {
 
     @Autowired
     private AuthenticationService authService;
+
+    @Autowired
+    private OtpService otpService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -72,6 +73,14 @@ public class AuthController {
             return ResponseEntity.ok(response);
         }
     }
+
+    @PostMapping("/activate")
+    public ResponseEntity<Object> verifyOtp(@RequestBody VerifyOtpRequest verifyOtpRequest) {
+        otpService.validateOtp(verifyOtpRequest.getEmail(), verifyOtpRequest.getOtp());
+        authService.activateUser(verifyOtpRequest.getEmail());
+        return ResponseEntity.ok(ApiResponse.success(null, "OTP verified"));
+    }
+
 
     // @GetMapping("/logout")
     // public ResponseEntity<?> logout(@RequestHeader("Authorization") String

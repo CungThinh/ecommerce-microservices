@@ -7,7 +7,6 @@ from config import Config
 
 async_engine = AsyncEngine(create_engine(url=Config.DATABASE_URL))
 
-
 async def init_db() -> None:
     async with async_engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)

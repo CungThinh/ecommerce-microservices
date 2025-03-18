@@ -4,6 +4,7 @@
     <option name="moduleMapping">
       <map>
         <entry key="auth-services" value="authservices (1) (cungthinh)" />
+        <entry key="order-services" value="payment-services" />
         <entry key="profile-services" value="user-services" />
       </map>
     </option>

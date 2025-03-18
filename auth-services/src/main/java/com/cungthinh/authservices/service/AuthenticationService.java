@@ -142,6 +142,10 @@ public class AuthenticationService {
             });
         }
 
+        if(user.getEnabled()) {
+            stringJoiner.add("ACTIVATED");
+        }
+
         return stringJoiner.toString();
     }
 
@@ -174,5 +178,11 @@ public class AuthenticationService {
         }
 
         return signedJWT;
+    }
+
+    public void activateUser(String email) {
+        UserEntity user = userResipotory.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        user.setEnabled(true);
+        userResipotory.save(user);
     }
 }

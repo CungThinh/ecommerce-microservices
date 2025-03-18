@@ -1,47 +1,21 @@
-from http.client import responses
-from typing import List
-
-from fastapi import HTTPException
-from fastapi.encoders import jsonable_encoder
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from checkout.schemas import CheckOutResponse
 from config import Config
-from order.schemas import CreateOrderRequest, ProductReserveResponse
+from order.schemas import CreateOrderRequest
 from order.models import Order
-from exceptions import ProductOutOfStock, UserUnauthorized
-import httpx
+from exceptions import UserUnauthorized, OrderNotFound
+from order.constants import OrderStatus
+from clients.product_service_client import ProductServiceClient
 
 
 class OrderService:
-    @staticmethod
-    async def create_order(request: CreateOrderRequest, session: AsyncSession, user_id: str):
+    def __init__(self):
+        self.product_services_url = Config.PRODUCT_SERVICES_URL
+        self.product_service_client = ProductServiceClient()
 
-        async with httpx.AsyncClient() as client:
-            try:
-                payload = jsonable_encoder({
-                    "cartId": request.cart_id,
-                    "cartProducts": [{
-                        "productId": product.product_id,
-                        "quantity": product.quantity
-                    } for product in request.order_products]
-                })
-                product_services_url = Config.PRODUCT_SERVICES_URL
-                response = await client.post(f"{product_services_url}/products/reserve", json=payload)
-                data = ProductReserveResponse(**response.json().get("data", {}))
-                for product_id, is_reserved in data.productReservationStatus.items():
-                    if not is_reserved:
-                        raise ProductOutOfStock()
-            except httpx.HTTPStatusError as e:
-                error_data = e.response.json()
-                raise HTTPException(
-                    status_code=e.response.status_code,
-                    detail={
-                        "code": error_data.get("code", 0),
-                        "message": error_data.get("message", "Unknown error"),
-                    }
-                )
+    async def create_order(self, request: CreateOrderRequest, user_id: str, session: AsyncSession) -> Order:
+        await self.product_service_client.reserve_products(request.cart_id, request.order_products)
         if request.user_id != user_id:
             raise UserUnauthorized()
 
@@ -74,7 +48,25 @@ class OrderService:
         await session.refresh(order)
         return order
 
-    @staticmethod
-    async def get_orders_by_user_id(user_id: str, session: AsyncSession) -> List[Order]:
+    async def get_order_by_id(self, order_id: int, session: AsyncSession) -> Order:
+        statement = select(Order).where(Order.id == order_id)
+        result = await session.execute(statement)
+        return result.scalars().one_or_none()
+
+    async def get_orders_by_user_id(self, user_id: str, session: AsyncSession):
         result = await session.execute(select(Order).where(Order.user_id == user_id))
         return result.scalars().all()
+
+    async def cancel_orders(self, order_id: int, user_id: str, session: AsyncSession):
+        order = await self.get_order_by_id(order_id, session)
+
+        if order is None:
+            raise OrderNotFound()
+
+        if order.user_id != user_id:
+            raise UserUnauthorized()
+
+        order.status = OrderStatus.CANCELLED
+        session.add(order)
+        await session.commit()
+        await session.refresh(order)
