@@ -11,10 +11,9 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
 mail:
-  host: smtp.gmail.com
-  port: 587
-  username: macthinh22@gmail.com
-  password: zjma izzr cabu witx
-  debug: true
+  host: ${MAIL_HOST}
+  port: ${MAIL_PORT}
+  username: ${MAIL_USERNAME}
+  password: ${MAIL_PASSWORD}
 server:
   port: 8086
