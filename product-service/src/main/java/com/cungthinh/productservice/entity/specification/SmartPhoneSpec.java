@@ -1,13 +1,14 @@
 package com.cungthinh.productservice.entity.specification;
 
+import static lombok.AccessLevel.PRIVATE;
+
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import static lombok.AccessLevel.PRIVATE;
 
 @Document(collection = "smartphone_specs")
 @Data

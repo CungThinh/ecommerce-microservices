@@ -1,9 +1,10 @@
 package com.cungthinh.notificationservices.service;
 
-import com.cungthinh.notificationservices.dto.request.EmailRequest;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import com.cungthinh.notificationservices.dto.request.EmailRequest;
 
 @Service
 public class EmailService {

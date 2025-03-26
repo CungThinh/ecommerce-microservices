@@ -1,14 +1,15 @@
 package com.cungthinh.productservice.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.cungthinh.productservice.dto.request.ProductCreationRequest;
 import com.cungthinh.productservice.dto.request.ReserveProductRequest;
 import com.cungthinh.productservice.dto.response.ApiResponse;
 import com.cungthinh.productservice.dto.response.ProductCreationResponse;
 import com.cungthinh.productservice.dto.response.ReserveProductResponse;
 import com.cungthinh.productservice.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/products")

@@ -2,6 +2,7 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from config import Config
+from messaging.kafka_producer import kafka_producer
 from order.schemas import CreateOrderRequest
 from order.models import Order
 from exceptions import UserUnauthorized, OrderNotFound
@@ -15,7 +16,6 @@ class OrderService:
         self.product_service_client = ProductServiceClient()
 
     async def create_order(self, request: CreateOrderRequest, user_id: str, session: AsyncSession) -> Order:
-        await self.product_service_client.reserve_products(request.cart_id, request.order_products)
         if request.user_id != user_id:
             raise UserUnauthorized()
 
@@ -43,9 +43,24 @@ class OrderService:
         #     session.add(order_product)
 
         session.add(order)
+
         await session.flush()
         await session.commit()
         await session.refresh(order)
+
+        message = {
+            "cartId": request.cart_id,
+            "cartProducts": [{
+                "productId": product.product_id,
+                "quantity": product.quantity
+            } for product in request.order_products]
+        }
+
+        await kafka_producer.send(
+            topic="order-created",
+            data=message
+        )
+
         return order
 
     async def get_order_by_id(self, order_id: int, session: AsyncSession) -> Order:

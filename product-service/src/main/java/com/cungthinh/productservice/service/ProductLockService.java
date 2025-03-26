@@ -1,10 +1,9 @@
 package com.cungthinh.productservice.service;
 
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class ProductLockService {
@@ -22,18 +21,17 @@ public class ProductLockService {
     public String acquireLock(String productId, String cartId, int quantity) {
         String key = LOCK_KEY + productId;
         for (int i = 0; i < RETRY_TIME; i++) {
-            Boolean success = redisTemplate.opsForValue().setIfAbsent(key, "locked", LOCK_TIMEOUT, TimeUnit.MILLISECONDS);
-            if(Boolean.TRUE.equals(success)) {
+            Boolean success =
+                    redisTemplate.opsForValue().setIfAbsent(key, "locked", LOCK_TIMEOUT, TimeUnit.MILLISECONDS);
+            if (Boolean.TRUE.equals(success)) {
                 boolean isReserved = inventoryService.reserveInventory(productId, quantity, cartId);
                 if (isReserved) {
                     redisTemplate.expire(key, LOCK_TIMEOUT, TimeUnit.MILLISECONDS);
                     return key;
-                }
-                else {
+                } else {
                     return null;
                 }
-            }
-            else {
+            } else {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {

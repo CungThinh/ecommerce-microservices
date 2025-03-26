@@ -1,11 +1,12 @@
 package com.cungthinh.productservice.entity.specification;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "charger_specs")
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)

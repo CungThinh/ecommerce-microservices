@@ -1,6 +1,25 @@
 spring:
   application:
     name: notification-services
+    user-services-url: http://localhost:8080
+  datasource:
+    url: jdbc:postgresql://localhost:5435/notificationservices
+    username: postgres
+    password: dontwastetime
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        "[format_sql]": true
+        "[use_sql_comments]": true
+        jdbc:
+          batch_size: 50
+        order_updates: true
+        order_inserts: true
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
@@ -12,8 +31,9 @@ spring:
         spring.json.trusted.packages: "*"
 mail:
   host: ${MAIL_HOST}
-  port: ${MAIL_PORT}
+  port: 587
   username: ${MAIL_USERNAME}
   password: ${MAIL_PASSWORD}
+  debug: true
 server:
   port: 8086

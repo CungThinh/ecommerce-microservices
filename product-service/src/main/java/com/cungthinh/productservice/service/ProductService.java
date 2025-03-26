@@ -1,5 +1,11 @@
 package com.cungthinh.productservice.service;
-import com.mongodb.client.result.UpdateResult;
+
+import java.util.List;
+
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.*;
+import org.springframework.stereotype.Service;
+
 import com.cungthinh.productservice.dto.request.CartProduct;
 import com.cungthinh.productservice.dto.request.ProductCreationRequest;
 import com.cungthinh.productservice.dto.request.ReserveProductRequest;
@@ -12,12 +18,9 @@ import com.cungthinh.productservice.mapper.ProductMapper;
 import com.cungthinh.productservice.repository.ProductRepository;
 import com.cungthinh.productservice.service.specification.SpecificationService;
 import com.cungthinh.productservice.utils.SlugGenerator;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.*;
-import org.springframework.stereotype.Service;
+import com.mongodb.client.result.UpdateResult;
 
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -29,7 +32,13 @@ public class ProductService {
     private final MongoTemplate mongoTemplate;
     private final InventoryService inventoryService;
 
-    public ProductService(ProductRepository productRepository, SpecificationService specificationService, ProductLockService productLockService, ProductMapper productMapper, MongoTemplate mongoTemplate, InventoryService inventoryService) {
+    public ProductService(
+            ProductRepository productRepository,
+            SpecificationService specificationService,
+            ProductLockService productLockService,
+            ProductMapper productMapper,
+            MongoTemplate mongoTemplate,
+            InventoryService inventoryService) {
         this.productRepository = productRepository;
         this.specificationService = specificationService;
         this.productLockService = productLockService;
@@ -79,7 +88,7 @@ public class ProductService {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(id));
         Update update = new Update();
-        if(publish) {
+        if (publish) {
             update.set("isPublished", true);
             update.set("isDraft", false);
         } else {
@@ -93,7 +102,8 @@ public class ProductService {
 
     public List<ProductResponse> searchProduct(String keyword) {
         TextCriteria textCriteria = TextCriteria.forDefaultLanguage().matching(keyword);
-        Query query = TextQuery.queryText(textCriteria).sortByScore()
+        Query query = TextQuery.queryText(textCriteria)
+                .sortByScore()
                 .addCriteria(Criteria.where("isPublished").is(true));
         List<Product> products = mongoTemplate.find(query, Product.class);
         return productMapper.toProductResponseList(products);
@@ -101,11 +111,12 @@ public class ProductService {
 
     public ReserveProductResponse reserveProduct(ReserveProductRequest request) {
         ReserveProductResponse response = new ReserveProductResponse();
-        for(CartProduct product: request.getCartProducts()) {
-            String keyLock = productLockService.acquireLock(product.getProductId(), request.getCartId(), product.getQuantity());
+        for (CartProduct product : request.getCartProducts()) {
+            String keyLock =
+                    productLockService.acquireLock(product.getProductId(), request.getCartId(), product.getQuantity());
             log.info("Key lock {}", keyLock);
             response.addProductStatus(product.getProductId(), keyLock != null);
-            if(keyLock != null) {
+            if (keyLock != null) {
                 productLockService.releaseLock(keyLock);
             }
         }

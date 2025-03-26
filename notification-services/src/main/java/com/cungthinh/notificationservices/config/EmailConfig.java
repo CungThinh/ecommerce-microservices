@@ -1,12 +1,12 @@
 package com.cungthinh.notificationservices.config;
 
+import java.util.Properties;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-
-import java.util.Properties;
 
 @Configuration
 public class EmailConfig {
@@ -15,8 +15,7 @@ public class EmailConfig {
     private ProviderConfig providerConfig;
 
     @Bean
-    public JavaMailSender mailSender()
-    {
+    public JavaMailSender mailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setHost(providerConfig.getHost());
         javaMailSender.setPort(providerConfig.getPort());
@@ -32,5 +31,4 @@ public class EmailConfig {
 
         return javaMailSender;
     }
-
 }

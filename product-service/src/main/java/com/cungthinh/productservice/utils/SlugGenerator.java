@@ -1,7 +1,8 @@
 package com.cungthinh.productservice.utils;
 
-import com.github.slugify.Slugify;
 import org.springframework.stereotype.Component;
+
+import com.github.slugify.Slugify;
 
 @Component
 public class SlugGenerator {

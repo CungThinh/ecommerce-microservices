@@ -1,15 +1,17 @@
 package com.cungthinh.authservices.service;
 
-import com.cungthinh.authservices.exception.CustomException;
-import com.cungthinh.authservices.exception.ErrorCode;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
+import static com.cungthinh.authservices.utils.SHA256Hashing.hashWithSHA256;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static com.cungthinh.authservices.utils.SHA256Hashing.hashWithSHA256;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+
+import com.cungthinh.authservices.exception.CustomException;
+import com.cungthinh.authservices.exception.ErrorCode;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -35,7 +37,7 @@ public class OtpService {
         String hashedKey = hashWithSHA256(key);
         String value = redisTemplate.opsForValue().get(hashedKey);
 
-        if(value == null) {
+        if (value == null) {
             throw new CustomException(ErrorCode.OTP_EXPIRED);
         }
 

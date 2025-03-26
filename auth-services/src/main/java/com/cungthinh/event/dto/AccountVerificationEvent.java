@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AccountVerificationEvent {
     String email;
+    String userId;
     String otp;
 }

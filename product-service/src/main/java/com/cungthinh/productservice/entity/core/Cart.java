@@ -1,17 +1,19 @@
 package com.cungthinh.productservice.entity.core;
 
-import com.cungthinh.productservice.enums.CartStatus;
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.FieldDefaults;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.cungthinh.productservice.enums.CartStatus;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 @Document(collection = "cart")
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
@@ -30,6 +32,7 @@ public class Cart {
 
     @Builder.Default
     int cartProductCount = 0;
+
     String userId;
 
     @CreatedDate

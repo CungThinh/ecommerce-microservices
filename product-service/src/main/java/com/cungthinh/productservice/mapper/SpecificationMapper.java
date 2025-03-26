@@ -1,10 +1,11 @@
 package com.cungthinh.productservice.mapper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.cungthinh.productservice.entity.specification.Specification;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import com.cungthinh.productservice.entity.specification.Specification;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class SpecificationMapper {

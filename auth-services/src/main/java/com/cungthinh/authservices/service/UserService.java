@@ -1,10 +1,10 @@
 package com.cungthinh.authservices.service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.cungthinh.event.dto.AccountVerificationEvent;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +29,7 @@ import com.cungthinh.authservices.mapper.UserMapper;
 import com.cungthinh.authservices.repository.RoleRepository;
 import com.cungthinh.authservices.repository.UserResipotory;
 import com.cungthinh.authservices.repository.feign.ProfileClient;
+import com.cungthinh.event.dto.AccountVerificationEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -79,7 +80,9 @@ public class UserService {
             String otp = otpService.generateOtp(newUser.getEmail());
             AccountVerificationEvent event = AccountVerificationEvent.builder()
                     .otp(otp)
-                    .email(newUser.getEmail()).build();
+                    .userId(newUser.getId())
+                    .email(newUser.getEmail())
+                    .build();
             kafkaTemplate.send("new-user-created", event);
 
             return userMapper.toUserResponse(newUser);
@@ -128,5 +131,9 @@ public class UserService {
                 .email(user.getEmail())
                 .roles(roles)
                 .build();
+    }
+
+    public List<String> getAllUserId() {
+        return userResipotory.getAllUserId();
     }
 }

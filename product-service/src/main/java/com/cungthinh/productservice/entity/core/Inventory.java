@@ -1,15 +1,16 @@
 package com.cungthinh.productservice.entity.core;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.FieldDefaults;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 @Document(collection = "inventories")
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
@@ -20,6 +21,7 @@ public class Inventory {
 
     @Builder.Default
     String location = "HCM";
+
     int stock;
 
     @Builder.Default

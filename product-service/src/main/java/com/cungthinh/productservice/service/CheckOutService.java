@@ -1,5 +1,10 @@
 package com.cungthinh.productservice.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.cungthinh.productservice.dto.request.ValidateCartAndProductRequest;
 import com.cungthinh.productservice.dto.response.CartProductResponse;
 import com.cungthinh.productservice.dto.response.ValidateCartAndProductResponse;
@@ -9,11 +14,8 @@ import com.cungthinh.productservice.exceptions.CustomException;
 import com.cungthinh.productservice.exceptions.ErrorCode;
 import com.cungthinh.productservice.repository.CartRepository;
 import com.cungthinh.productservice.repository.ProductRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -22,7 +24,8 @@ public class CheckOutService {
     private final CartRepository cartRepository;
     private final InventoryService inventoryService;
 
-    public CheckOutService(ProductRepository productRepository, CartRepository cartRepository, InventoryService inventoryService) {
+    public CheckOutService(
+            ProductRepository productRepository, CartRepository cartRepository, InventoryService inventoryService) {
         this.productRepository = productRepository;
         this.cartRepository = cartRepository;
         this.inventoryService = inventoryService;
@@ -30,12 +33,16 @@ public class CheckOutService {
 
     public ValidateCartAndProductResponse validateCartAndProduct(ValidateCartAndProductRequest request) {
         log.info("Request {}", request);
-        Cart userCart = cartRepository.findById(request.getCartId()).orElseThrow(() -> new CustomException(ErrorCode.CART_NOT_FOUND));
+        Cart userCart = cartRepository
+                .findById(request.getCartId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CART_NOT_FOUND));
 
         List<CartProductResponse> cartProductResponses = new ArrayList<>();
 
         request.getCartProducts().forEach(cartProduct -> {
-            Product product = productRepository.findById(cartProduct.getProductId()).orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+            Product product = productRepository
+                    .findById(cartProduct.getProductId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
             if (!inventoryService.isStockAvailable(product.getId(), cartProduct.getQuantity())) {
                 throw new CustomException(ErrorCode.INVENTORY_OUT_OF_STOCK);
             }
@@ -50,6 +57,7 @@ public class CheckOutService {
 
         return ValidateCartAndProductResponse.builder()
                 .cartId(userCart.getId())
-                .cartProducts(cartProductResponses).build();
+                .cartProducts(cartProductResponses)
+                .build();
     }
 }

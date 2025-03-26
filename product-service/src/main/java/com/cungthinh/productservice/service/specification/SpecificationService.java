@@ -1,15 +1,16 @@
 package com.cungthinh.productservice.service.specification;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+import org.springframework.stereotype.Component;
+
 import com.cungthinh.productservice.entity.specification.AccessorySpec;
 import com.cungthinh.productservice.entity.specification.SmartPhoneSpec;
 import com.cungthinh.productservice.entity.specification.Specification;
 import com.cungthinh.productservice.repository.AccessorySpecRepository;
 import com.cungthinh.productservice.repository.SmartPhoneSpecRepository;
-import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 
 @Component
 public class SpecificationService {
@@ -19,9 +20,7 @@ public class SpecificationService {
     private final Map<String, Function<Map<String, Object>, Specification>> specificationRegistry = new HashMap<>();
 
     public SpecificationService(
-            AccessorySpecRepository accessorySpecRepository,
-            SmartPhoneSpecRepository smartPhoneSpecRepository
-    ) {
+            AccessorySpecRepository accessorySpecRepository, SmartPhoneSpecRepository smartPhoneSpecRepository) {
         this.accessorySpecRepository = accessorySpecRepository;
         this.smartPhoneSpecRepository = smartPhoneSpecRepository;
         specificationRegistry.put("Accessory", this::createAccessorySpec);
@@ -59,7 +58,6 @@ public class SpecificationService {
         return newSmartPhone;
     }
 }
-
 
 // public class SpecificationFactoryRegistry {
 //    // Map of category name to specification class and repository
@@ -110,4 +108,4 @@ public class SpecificationService {
 //            return repository.save(spec);
 //        }
 //    }
-//}
+// }

@@ -1,12 +1,13 @@
 package com.cungthinh.productservice.entity.core;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.FieldDefaults;
+import java.util.Date;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 @Document(collection = "inventory_reservations")
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
