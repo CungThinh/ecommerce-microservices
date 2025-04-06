@@ -8,16 +8,23 @@ import org.springframework.stereotype.Service;
 
 import com.cungthinh.productservice.dto.request.CartProduct;
 import com.cungthinh.productservice.dto.request.ProductCreationRequest;
+import com.cungthinh.productservice.dto.request.ProductCreationRequestV2;
 import com.cungthinh.productservice.dto.request.ReserveProductRequest;
-import com.cungthinh.productservice.dto.response.ProductCreationResponse;
-import com.cungthinh.productservice.dto.response.ProductResponse;
-import com.cungthinh.productservice.dto.response.ReserveProductResponse;
+import com.cungthinh.productservice.dto.response.*;
 import com.cungthinh.productservice.entity.core.Product;
+import com.cungthinh.productservice.entity.core.SkuProduct;
+import com.cungthinh.productservice.entity.core.SpuProduct;
 import com.cungthinh.productservice.entity.specification.Specification;
 import com.cungthinh.productservice.mapper.ProductMapper;
+import com.cungthinh.productservice.mapper.SkuProductMapper;
+import com.cungthinh.productservice.mapper.SpuProductMapper;
 import com.cungthinh.productservice.repository.ProductRepository;
+import com.cungthinh.productservice.repository.SkuProductRepository;
+import com.cungthinh.productservice.repository.SpuProductRepository;
 import com.cungthinh.productservice.service.specification.SpecificationService;
+import com.cungthinh.productservice.utils.ProductUtils;
 import com.cungthinh.productservice.utils.SlugGenerator;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.result.UpdateResult;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +38,11 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final MongoTemplate mongoTemplate;
     private final InventoryService inventoryService;
+    private final SpuProductRepository spuProductRepository;
+    private final SkuProductRepository skuProductRepository;
+    private final SkuProductMapper skuProductMapper;
+    private final SpuProductMapper spuProductMapper;
+    private final MongoClient mongo;
 
     public ProductService(
             ProductRepository productRepository,
@@ -38,13 +50,23 @@ public class ProductService {
             ProductLockService productLockService,
             ProductMapper productMapper,
             MongoTemplate mongoTemplate,
-            InventoryService inventoryService) {
+            InventoryService inventoryService,
+            SpuProductRepository spuProductRepository,
+            SkuProductRepository skuProductRepository,
+            SkuProductMapper skuProductMapper,
+            SpuProductMapper spuProductMapper,
+            MongoClient mongo) {
         this.productRepository = productRepository;
         this.specificationService = specificationService;
         this.productLockService = productLockService;
         this.productMapper = productMapper;
         this.mongoTemplate = mongoTemplate;
         this.inventoryService = inventoryService;
+        this.spuProductRepository = spuProductRepository;
+        this.skuProductRepository = skuProductRepository;
+        this.skuProductMapper = skuProductMapper;
+        this.spuProductMapper = spuProductMapper;
+        this.mongo = mongo;
     }
 
     public ProductCreationResponse createProduct(ProductCreationRequest request) {
@@ -66,6 +88,48 @@ public class ProductService {
         productRepository.save(newProduct);
         inventoryService.createProductInventory(newProduct);
         return productMapper.toProductCreationResponse(newProduct);
+    }
+
+    public String createProductV2(ProductCreationRequestV2 request) {
+
+        SpuProduct newProduct = SpuProduct.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .category(request.getCategory())
+                .price(request.getPrice())
+                .productAttributes(request.getProductAttributes())
+                .productVariants(request.getProductVariants())
+                .build();
+        String productSlug = SlugGenerator.toSlug(request.getName());
+        newProduct.setSlug(productSlug);
+        newProduct.setProductId(ProductUtils.generateProductId());
+
+        spuProductRepository.save(newProduct);
+
+        request.getSkuList().forEach(sku -> {
+            SkuProduct skuProduct = SkuProduct.builder()
+                    .skuTierIndex(sku.getSkuTierIndex())
+                    .productId(newProduct.getProductId())
+                    .skuId(newProduct.getProductId() + "." + ProductUtils.generateProductId())
+                    .price(sku.getPrice())
+                    .stock(sku.getStock())
+                    .build();
+            skuProductRepository.save(skuProduct);
+        });
+
+        return "Ok";
+    }
+
+    public ProductResponseV2 getSpuInfo(String productId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("productId").is(productId));
+        List<SkuProduct> skuProducts = mongoTemplate.find(query, SkuProduct.class);
+        SpuProduct spuProduct = mongoTemplate.findOne(query, SpuProduct.class);
+
+        return ProductResponseV2.builder()
+                .spuInfo(spuProductMapper.toSpuResponse(spuProduct))
+                .skuList(skuProductMapper.toSkuReponseList(skuProducts))
+                .build();
     }
 
     public List<ProductResponse> getAllProducts() {
