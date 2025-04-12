@@ -18,8 +18,20 @@ spring:
       enable-auto-commit: false
       properties:
         spring.json.trusted.packages: "*"
+  profiles:
+    active: prod
 server:
   port: 8082
+
+otel:
+  exporter:
+    otlp:
+      endpoint: https://s1269436.eu-nbg-2.betterstackdata.com
+      headers:
+        Authorization: Bearer CwSKeVs5ZAw9cVMX2ZAquJs4
+  resource:
+    attributes:
+      service.name: product-service
 
 logging:
   level:

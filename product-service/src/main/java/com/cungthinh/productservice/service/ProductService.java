@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.cungthinh.productservice.dto.request.CartProduct;
@@ -42,7 +43,7 @@ public class ProductService {
     private final SkuProductRepository skuProductRepository;
     private final SkuProductMapper skuProductMapper;
     private final SpuProductMapper spuProductMapper;
-    private final MongoClient mongo;
+    private final CacheService cacheService;
 
     public ProductService(
             ProductRepository productRepository,
@@ -54,8 +55,7 @@ public class ProductService {
             SpuProductRepository spuProductRepository,
             SkuProductRepository skuProductRepository,
             SkuProductMapper skuProductMapper,
-            SpuProductMapper spuProductMapper,
-            MongoClient mongo) {
+            SpuProductMapper spuProductMapper, CacheService cacheService) {
         this.productRepository = productRepository;
         this.specificationService = specificationService;
         this.productLockService = productLockService;
@@ -66,7 +66,7 @@ public class ProductService {
         this.skuProductRepository = skuProductRepository;
         this.skuProductMapper = skuProductMapper;
         this.spuProductMapper = spuProductMapper;
-        this.mongo = mongo;
+        this.cacheService = cacheService;
     }
 
     public ProductCreationResponse createProduct(ProductCreationRequest request) {
@@ -121,15 +121,25 @@ public class ProductService {
     }
 
     public ProductResponseV2 getSpuInfo(String productId) {
+
+        String cacheKey = "spu-" + productId;
+
         Query query = new Query();
         query.addCriteria(Criteria.where("productId").is(productId));
         List<SkuProduct> skuProducts = mongoTemplate.find(query, SkuProduct.class);
         SpuProduct spuProduct = mongoTemplate.findOne(query, SpuProduct.class);
 
-        return ProductResponseV2.builder()
+        if(spuProduct == null) {
+            cacheService.putWithExpire(cacheKey, null, 10 * 60);
+            return null;
+        }
+
+        ProductResponseV2 response = ProductResponseV2.builder()
                 .spuInfo(spuProductMapper.toSpuResponse(spuProduct))
                 .skuList(skuProductMapper.toSkuReponseList(skuProducts))
                 .build();
+        cacheService.putWithExpire(cacheKey, response, 10 * 60); // for 10 minutes
+        return response;
     }
 
     public List<ProductResponse> getAllProducts() {

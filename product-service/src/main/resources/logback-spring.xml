@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_PATH" value="logs" />
+    <property name="LOG_FILE" value="${LOG_PATH}/application.log" />
+
+    <!-- Console output -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <logLevel/>
+                <threadName/>
+                <loggerName/>
+                <mdc/>               <!-- Important: this allows requestId, etc. -->
+                <message/>
+                <arguments/>
+                <stackTrace/>
+                <tracing/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>localhost:5050</destination> <!-- Logstash host and port -->
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp />
+                <logLevel />
+                <threadName />
+                <loggerName />
+                <mdc />
+                <message />
+                <arguments />
+                <stackTrace />
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- Set debug logging for your package -->
+    <springProfile name="dev">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="JSON_FILE"/>
+            <appender-ref ref="LOGSTASH"/>
+        </root>
+
+        <logger name="com.cungthinh.productservice" level="DEBUG"/>
+    </springProfile>
+
+    <!-- ======== PROD PROFILE ======== -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="JSON_FILE"/>
+            <appender-ref ref="LOGSTASH"/>
+        </root>
+
+        <logger name="com.cungthinh.productservice" level="INFO"/>
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.mongodb.driver" level="WARN"/>
+        <logger name="org.apache.kafka" level="WARN"/>
+    </springProfile>
+</configuration>
