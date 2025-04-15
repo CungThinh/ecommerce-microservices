@@ -32,20 +32,26 @@
         </encoder>
     </appender>
 
-    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>localhost:5050</destination> <!-- Logstash host and port -->
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp />
-                <logLevel />
-                <threadName />
-                <loggerName />
-                <mdc />
-                <message />
-                <arguments />
-                <stackTrace />
-            </providers>
-        </encoder>
+<!--    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">-->
+<!--        <destination>localhost:5050</destination> &lt;!&ndash; Logstash host and port &ndash;&gt;-->
+<!--        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">-->
+<!--            <providers>-->
+<!--                <timestamp />-->
+<!--                <logLevel />-->
+<!--                <threadName />-->
+<!--                <loggerName />-->
+<!--                <mdc />-->
+<!--                <message />-->
+<!--                <arguments />-->
+<!--                <stackTrace />-->
+<!--            </providers>-->
+<!--        </encoder>-->
+<!--    </appender>-->
+
+    <appender name="OPEN_TELEMETRY"
+              class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+        <captureExperimentalAttributes>true</captureExperimentalAttributes>
+        <captureKeyValuePairAttributes>true</captureKeyValuePairAttributes>
     </appender>
 
     <!-- Set debug logging for your package -->
@@ -53,7 +59,8 @@
         <root level="DEBUG">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="JSON_FILE"/>
-            <appender-ref ref="LOGSTASH"/>
+<!--            <appender-ref ref="LOGSTASH"/>-->
+            <appender-ref ref="OPEN_TELEMETRY"/>
         </root>
 
         <logger name="com.cungthinh.productservice" level="DEBUG"/>
@@ -63,13 +70,13 @@
     <springProfile name="prod">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="JSON_FILE"/>
-            <appender-ref ref="LOGSTASH"/>
+            <appender-ref ref="OPEN_TELEMETRY"/>
+<!--            <appender-ref ref="LOGSTASH"/>-->
         </root>
 
-        <logger name="com.cungthinh.productservice" level="INFO"/>
-        <logger name="org.springframework" level="WARN"/>
-        <logger name="org.mongodb.driver" level="WARN"/>
-        <logger name="org.apache.kafka" level="WARN"/>
+<!--        <logger name="com.cungthinh.productservice" level="INFO"/>-->
+<!--        <logger name="org.springframework" level="WARN"/>-->
+<!--        <logger name="org.mongodb.driver" level="WARN"/>-->
+<!--        <logger name="org.apache.kafka" level="WARN"/>-->
     </springProfile>
 </configuration>

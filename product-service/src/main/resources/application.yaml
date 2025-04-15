@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: product-service
   data:
     mongodb:
       authentication-database: admin
@@ -26,13 +28,24 @@ server:
 otel:
   exporter:
     otlp:
-      endpoint: https://s1269436.eu-nbg-2.betterstackdata.com
-      headers:
-        Authorization: Bearer CwSKeVs5ZAw9cVMX2ZAquJs4
+      endpoint: http://localhost:4317
+      protocol: grpc
   resource:
     attributes:
       service.name: product-service
 
 logging:
   level:
-    org.springframework.data.mongodb.core: DEBUG
+    root: info
+
+management:
+  otlp:
+    metrics:
+      export:
+        url: http://localhost:4318/v1/metrics
+        step: 10s
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+  tracing:
+    sampling:
+      probability: 1.0
